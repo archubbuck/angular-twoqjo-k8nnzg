@@ -1,6 +1,6 @@
 import { Column, Field } from './models';
 
-export const columns: Column[] = [
+export const columns = [
   {
     id: 1,
     fieldId: 3,

@@ -8,6 +8,7 @@ export class ColumnsService {
   private counter: number = columns.length;
 
   public columns(): Column[] {
+    console.log(columns);
     return this.data;
   }
 

@@ -78,7 +78,9 @@ export class AppComponent implements OnInit {
   constructor(private service: ColumnsService) {}
 
   public ngOnInit(): void {
-    this.gridData = this.service.columns();
+    const cols = this.service.columns();
+    console.log(cols);
+    this.gridData = cols;
   }
 
   public field(id: number): Field {
