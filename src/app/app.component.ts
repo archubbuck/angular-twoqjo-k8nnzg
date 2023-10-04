@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ProductsService } from './products.service';
-import { categories } from './categories';
-import { Category } from './model';
-import { Product } from './products';
+import { ColumnsService } from './columns.service';
+import { fields } from './data';
 import {
   AddEvent,
   CancelEvent,
@@ -12,6 +10,7 @@ import {
   SaveEvent,
   GridComponent,
 } from '@progress/kendo-angular-grid';
+import { Column, Field } from './models';
 
 @Component({
   selector: 'my-app',
@@ -31,28 +30,24 @@ import {
                 <button kendoGridAddCommand>Add new</button>
             </ng-template>
             <kendo-grid-rowreorder-column [width]="40"></kendo-grid-rowreorder-column>
-            <kendo-grid-column field="CategoryID" title="Category" [width]="150">
+            <kendo-grid-column field="fieldId" title="Field" [width]="150">
                 <ng-template kendoGridEditTemplate let-dataItem="dataItem" let-formGroup="formGroup">
                     <kendo-dropdownlist
-                        [defaultItem]="{
-                            CategoryID: null,
-                            CategoryName: 'Test null item'
-                        }"
-                        [data]="categories"
-                        textField="CategoryName"
-                        valueField="CategoryID"
+                        [data]="fields"
+                        textField="name"
+                        valueField="id"
                         [valuePrimitive]="true"
-                        [formControl]="formGroup.get('CategoryID')"
+                        [formControl]="formGroup.get('fieldId')"
                     >
                     </kendo-dropdownlist>
                 </ng-template>
                 <ng-template kendoGridCellTemplate let-dataItem>
                     <kendo-dropdownlist
-                        [data]="categories"
-                        textField="CategoryName"
-                        valueField="CategoryID"
+                        [data]="fields"
+                        textField="name"
+                        valueField="id"
                         [valuePrimitive]="true"
-                        [value]="dataItem.CategoryID"
+                        [value]="dataItem.fieldId"
                         (valueChange)="onValueChange($event, dataItem)"
                     >
                     </kendo-dropdownlist>
@@ -75,27 +70,25 @@ import {
     `,
 })
 export class AppComponent implements OnInit {
-  public gridData: Product[];
-  public categories: Category[] = categories;
+  public gridData: Column[];
+  public fields: Field[] = fields;
   public formGroup: FormGroup;
   private editedRowIndex: number;
 
-  constructor(private service: ProductsService) {}
+  constructor(private service: ColumnsService) {}
 
   public ngOnInit(): void {
-    this.gridData = this.service.products();
+    this.gridData = this.service.columns();
   }
 
-  public category(id: number): Category {
-    return this.categories.find((x) => x.CategoryID === id);
+  public field(id: number): Field {
+    return this.fields.find((x) => x.id === id);
   }
 
   public addHandler({ sender }: AddEvent): void {
     this.closeEditor(sender);
 
-    this.formGroup = createFormGroup({
-      CategoryID: 1,
-    });
+    this.formGroup = createFormGroup({});
 
     sender.addRow(this.formGroup);
   }
@@ -115,9 +108,9 @@ export class AppComponent implements OnInit {
   }
 
   public saveHandler({ sender, rowIndex, formGroup, isNew }: SaveEvent): void {
-    const product = formGroup.value;
+    const column = formGroup.value;
 
-    this.service.save(product, isNew);
+    this.service.save(column, isNew);
 
     sender.closeRow(rowIndex);
   }
@@ -127,7 +120,7 @@ export class AppComponent implements OnInit {
   }
 
   public onValueChange(e, item) {
-    item.CategoryID = e;
+    item.fieldId = e;
     this.service.save(item, false);
   }
 
@@ -143,6 +136,6 @@ export class AppComponent implements OnInit {
 
 const createFormGroup = (dataItem) =>
   new FormGroup({
-    ProductID: new FormControl(dataItem.ProductID),
-    CategoryID: new FormControl(dataItem.CategoryID, Validators.required),
+    id: new FormControl(dataItem.id),
+    fieldId: new FormControl(dataItem.fieldId, Validators.required),
   });
